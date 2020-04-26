@@ -34,7 +34,7 @@ export default Mixin.create(DataAdapterMixin, {
     Authorization: Bearer <token>
     ```
   */
-  headers: computed(`session.data.authenticated`, function() {
+  headers: computedHeadersFactory( function() {
     const data = get(this, 'session.data.authenticated');
     const token = get(data, this.get('tokenPropertyName'));
     const prefix = this.get('authorizationPrefix');
@@ -48,3 +48,9 @@ export default Mixin.create(DataAdapterMixin, {
     return headers;
   })
 });
+
+function computedHeadersFactory(fn) {
+  const conf = config['ember-simple-auth-token'] || {};
+  const tokenPropertyName = conf.tokenPropertyName || 'token';
+  return computed(`session.data.authenticated.${tokenPropertyName}`, fn);
+}
