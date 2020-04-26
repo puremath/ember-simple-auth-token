@@ -2,6 +2,7 @@ import Mixin from '@ember/object/mixin';
 import { inject } from '@ember/service';
 import { get } from '@ember/object';
 import { isEmpty } from '@ember/utils';
+import { computed } from '@ember/object';
 import DataAdapterMixin from 'ember-simple-auth/mixins/data-adapter-mixin';
 import config from 'ember-get-config';
 
@@ -27,23 +28,23 @@ export default Mixin.create(DataAdapterMixin, {
   },
 
   /**
-    Authorizes an XHR request by sending the `token` properties from the session in the `Authorization` header:
+    Adds the `Authorization` header using the header computed propertiy.
 
     ```
     Authorization: Bearer <token>
     ```
-
-    @method authorize
-    @param {XMLHttpRequest} xhr
   */
-  authorize(xhr) {
+  headers: computed(`session.data.authenticated`, function() {
     const data = get(this, 'session.data.authenticated');
     const token = get(data, this.get('tokenPropertyName'));
     const prefix = this.get('authorizationPrefix');
     const header = this.get('authorizationHeaderName');
+    const headers = {};
 
     if (this.get('session.isAuthenticated') && !isEmpty(token)) {
-      xhr.setRequestHeader(header, prefix + token);
+      headers[header] = `${prefix} ${this.session.data.authenticated.access_token}`.trim();
     }
-  }
+
+    return headers;
+  })
 });
