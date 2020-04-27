@@ -42,7 +42,7 @@ export default Mixin.create(DataAdapterMixin, {
     const headers = {};
 
     if (this.get('session.isAuthenticated') && !isEmpty(token)) {
-      headers[header] = `${prefix} ${this.session.data.authenticated.access_token}`.trim();
+      headers[header] = `${prefix}${token}`;
     }
 
     return headers;
